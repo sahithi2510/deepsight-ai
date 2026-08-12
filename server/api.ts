@@ -241,7 +241,9 @@ apiRouter.post('/predict', upload.single('file'), async (req: Request, res: Resp
 
   let resultData: any = null;
 
-  // 1. Try forwarding upload to Python FastAPI backend at http://127.0.0.1:8000/predict
+  const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || 'http://127.0.0.1:8000';
+
+  // 1. Try forwarding upload to Python FastAPI backend
   try {
     const formData = new FormData();
     formData.append('file', file.buffer, {
@@ -249,7 +251,7 @@ apiRouter.post('/predict', upload.single('file'), async (req: Request, res: Resp
       contentType: file.mimetype || 'image/jpeg'
     });
 
-    const pyRes = await axios.post('http://127.0.0.1:8000/predict', formData, {
+    const pyRes = await axios.post(`${PYTHON_SERVICE_URL}/predict`, formData, {
       headers: {
         ...formData.getHeaders()
       },
@@ -260,7 +262,7 @@ apiRouter.post('/predict', upload.single('file'), async (req: Request, res: Resp
       resultData = pyRes.data;
     }
   } catch (pyErr: any) {
-    console.warn('[Express Proxy] Python service http://127.0.0.1:8000/predict unreachable or error, falling back to DIP processing:', pyErr?.message || pyErr);
+    console.warn(`[Express Proxy] Python service ${PYTHON_SERVICE_URL}/predict unreachable or error, falling back to DIP processing:`, pyErr?.message || pyErr);
   }
 
   // 2. Fallback to Node.js DIP processing if Python service is unavailable
