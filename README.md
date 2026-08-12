@@ -49,6 +49,19 @@ The two services run independently and must both be started manually (see below)
 
 ---
 
+## Live Demo
+
+Deployed on [Render](https://render.com) as two separate free-tier web services:
+
+- **Gateway (frontend + API proxy)**: `https://deepsight-gateway.onrender.com`
+- **ML inference service**: `https://deepsight-python.onrender.com`
+
+The gateway calls the ML service using the `PYTHON_SERVICE_URL` environment variable rather than a hardcoded address, so the same code runs locally (pointing at `127.0.0.1:8000`) and in production (pointing at the deployed Python service URL).
+
+> Free-tier services spin down after inactivity. The first request after idle time may take 30-50 seconds while the service wakes up.
+
+---
+
 ## Setup & Running Locally
 
 **1. Install Python dependencies and start the inference service:**
@@ -97,6 +110,15 @@ DeepSight-AI/
 ├── package.json
 └── README.md
 ```
+
+---
+
+## Deploying to Render
+
+1. Push the repo to GitHub, including `backend/models/deepsight_model.pt` (small enough to commit directly — no external download step needed at deploy time).
+2. **Create the ML service**: New Web Service → select the repo → Runtime: Python 3 → Build: `pip install fastapi uvicorn torch torchvision opencv-python-headless pillow numpy python-multipart` → Start: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`.
+3. **Create the gateway service**: New Web Service → same repo → Runtime: Node → Build: `npm install && npm run build` → Start: `npm run start` → add environment variable `PYTHON_SERVICE_URL` set to the ML service's Render URL.
+4. Render auto-redeploys both services on every push to the connected branch.
 
 ---
 
