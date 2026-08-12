@@ -1,0 +1,6 @@
+{
+  "name": "DeepSight AI",
+  "description": "AI-Generated vs Real Photograph detector with Grad-CAM visual explainability and digital image processing (DIP) analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
